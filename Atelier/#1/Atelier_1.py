@@ -19,3 +19,4 @@ print(f"Bienvenue à Cactusity, {name}")
 
 ville = input("D'où viens-tu mon ami? ")
 print(f"Ah, tu viens de {ville}! C'est un endroit magnifique.")
+
