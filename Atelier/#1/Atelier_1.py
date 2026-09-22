@@ -1,4 +1,4 @@
-# Note Perso: 
+# Note Perso: exit() pour quitter le ce qui est dans le terminal, CTRL + C pour quitter le programme en cours d'exécution dans le terminal
 # sélectionner plusieurs lignes CTRL + ALT + SHIFT
 # input c'est une fonction avec paremètre type string  
 # Façon de setter les strings:
