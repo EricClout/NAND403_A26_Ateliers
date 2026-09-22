@@ -36,13 +36,22 @@ except:
 for i in data:
     for k in i.values():
         print(f"   - {k}")
-# print(f"Drink: {drink['name']}, Price: {drink['price']}, Type: {drink['type']}")
 
-'''with open(json_file) as json_data:
-    data = json.load(json_data)
-    print(data)'''
+app = QApplication([])
 
-app = QApplication()
+tableau = QTableWidget()
+tableau.setRowCount(len(data))
+tableau.setColumnCount(len(data[0]))
+tableau.setHorizontalHeaderLabels(data[0].keys())
+
+# Remplir le tableau
+for i in range(len(data)):
+    item = data[i]
+    tableau.setItem(i, 0, QTableWidgetItem(item["name"]))
+    tableau.setItem(i, 1, QTableWidgetItem(item["price"]))
+    tableau.setItem(i, 2, QTableWidgetItem(item["type"]))
+
 window = QMainWindow()
+window.setCentralWidget(tableau)
 window.show()
 sys.exit(app.exec())
