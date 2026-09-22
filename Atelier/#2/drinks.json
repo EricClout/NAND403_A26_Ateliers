@@ -13,5 +13,10 @@
         "name" : "Water",
         "price" : "100.00",
         "type" : "alchool-free"
+    },
+    {
+        "name" : "Juice",
+        "price" : "5.00",
+        "type" : "alchool-free"
     }
 ]
