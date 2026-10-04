@@ -12,14 +12,6 @@ se faire des amis, il accepte.
 D'un air satisfait, le mystérieux modélisateur lui présente son test : Écrire un script Python qui tourne dans Maya qui affiche un message de son choix.
 
 '''
-'''import maya.cmds as cmds
-
-cmds.confirmDialog(
-    title='Message de Cactus City',
-    message='Un nouveau cowboy est arrivé en ville !',
-    button=['OK'],
-    defaultButton='OK'
-)'''
 
 from PySide6.QtWidgets import (
     QWidget,
