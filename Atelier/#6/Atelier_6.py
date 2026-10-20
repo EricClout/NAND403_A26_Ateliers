@@ -5,13 +5,13 @@ pour cette raison qu'il veut redessiner la ville en commençant par l'ajout de d
 encore de l'aide pour construire des clôtures. Étant un tech artist, votre réflexe est, bien sûr, de faire 
 un script dans Maya pour accélérer le processus."""
 
-#### CODE DE L'ATELIER 4-5 ###
+
 import random
+from unicodedata import name
 from maya import cmds
 import maya.cmds as cmds
 
-import random
-from maya import cmds
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QWidget,
     QLabel,
@@ -20,168 +20,131 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QPushButton,
     QSpinBox,
-    QDoubleSpinBox
-)
+    QDoubleSpinBox,
+    QSlider             # Utilisé pour création de slider bar
+    )
+
 
 # ------------------------------------------------------------------------------------------
-# Classe personnalisée pour gérer la génération aléatoire d'objets dans Maya
-class RandomGenerator(QWidget):
-    # Initialisation de la fenêtre avec comme titre "Atelier 4-5"
+# Classe personnalisée pour gérer la création procédurale de clôtures dans Maya
+class FenceGenerator(QWidget):
+    
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Atelier 4-5")
+        self.setWindowTitle("Atelier 6 - Clôtures pour Jason")
         self.create_ui()
 
-        # Définir la taille de la fenêtre et setter ses limites
+        # Définir la taille de la fenêtre et fixer ses limites
         self.resize(400, 300)
         self.setMinimumSize(400, 250)
 
-    #                       --------------------
+        #                       --------------------
 
-    # Création de l'interface utilisateur
+        # Création de l'interface utilisateur
     def create_ui(self):
         # Layout principal vertical
         layout = QVBoxLayout(self)
 
-        # Crée la ligne (Layout de l'interface) horizontal pour le Nb d'objets
-        objs_layout = QHBoxLayout()
-        objs_label = QLabel("Nb d'objects ?")
+        # Crée (Layout horizontal) pour les sliders
+        numb_layout = QHBoxLayout()
+        numb_label = QLabel("Nombre de poteaux ?")
 
-        # ---------- (QSpinBox) !!! C'est nouveau ça !!! ---------- #
-        # Crée à case pour enter un Nb d'objets à spawner
-        self.obj_spin = QSpinBox()                        # Crée la case éditable
-        self.obj_spin.setRange(1, 1000)                   # Range max de 1000 objets
-        self.obj_spin.setValue(5)                         # Valeur par défaut de 5 objets
+        # ----------- (QSlider) !!! C'est nouveau ça !!! ----------- #
+        # Création du slider horizontale
+        self.numb_slider = QSlider(Qt.Orientation.Horizontal)
+        self.numb_slider.setRange(2, 50)                                       # Limites Min (2) et Max (50)
+        self.numb_slider.setValue(10)                                          # Valeur par défaut (10)
 
-        # Crée la ligne du texte (label) et du spinbox au layout horizontal
-        objs_layout.addWidget(objs_label)
-        objs_layout.addWidget(self.obj_spin)
-        layout.addLayout(objs_layout)                    # Ceci ajoute les 2 lignes ci-dessus au layout vertical principal
+        # Label dynamique qui affiche la valeur em cours du slider
+        self.numb_value_label = QLabel("10")
 
-        # ----------- (QGridLayout) !!! C'est nouveau ça !!! ----------- #
-        #  Grille pour organiser les limites Min / Max des valeurs entrées
-        grid_layout = QGridLayout()
+        # ** Connexion du signal : quand la valeur du slider change, on met à jour le texte du QLabel
+        # ** (Voir méthode update_numb_label plus bas)
+        self.numb_slider.valueChanged.connect(self.update_numb_label)
 
-        # En-têtes des colonnes Min & Max
-        grid_layout.addWidget(QLabel("Min"), 0, 1)          # En-tête colonne 1
-        grid_layout.addWidget(QLabel("Max"), 0, 2)          # En-tête colonne 2
+        # Crée la ligne du slider au layout horizontal
+        numb_layout.addWidget(numb_label)
+        numb_layout.addWidget(self.numb_slider)
+        numb_layout.addWidget(self.numb_value_label)
+        layout.addLayout(numb_layout)                   # Ceci ajoute les 3 lignes ci-dessus au layout vertical principal
 
-        # ------------------------- "Position X" ------------------------ #
-        # Configuration des colonnes & de la rangée
-        grid_layout.addWidget(QLabel("Position X"), 1, 0)   # Titre Rangées #1 à gauche
-        self.pos_x_min = QDoubleSpinBox()                   # Crée la case éditable
-        self.pos_x_min.setRange(-1000, 1000)                # Range Min & Max
-        self.pos_x_min.setValue(-50)                        # Valeur par défaut
+        # ----------- (QDoubleSpinBox) ESPACE entre les POTEAUX ----------- #
+        # Crée (Layout horizontal) pour les sliders
+        spacing_layout = QHBoxLayout()
+        spacing_label = QLabel("Espace entre les poteaux ?")                    # Titre Rangées #1 à gauche        
+        self.spacing_spin = QDoubleSpinBox()                                    # Crée la case éditable
+        self.spacing_spin.setRange(0.5, 10.0)                                   # Range Min & Max
+        self.spacing_spin.setValue(2.0)                                         # Valeur par défaut
 
-        self.pos_x_max = QDoubleSpinBox()                   # Crée la case éditable
-        self.pos_x_max.setRange(-1000, 1000)                # Range Min & Max
-        self.pos_x_max.setValue(50)                         # Valeur par défaut
+        # Crée la ligne du slider au layout horizontal
+        spacing_layout.addWidget(spacing_label)
+        spacing_layout.addWidget(self.spacing_spin)        
+        layout.addLayout(spacing_layout)                # Ceci ajoute les 2 lignes ci-dessus au layout vertical principal
 
-        grid_layout.addWidget(self.pos_x_min, 1, 1)         # Rangée 1, Colonne 1
-        grid_layout.addWidget(self.pos_x_max, 1, 2)         # Rangée 1, Colonne 2
-
-        # ------------------------- "Position Y" ------------------------ #
-        # Configuration des colonnes & de la rangée
-        grid_layout.addWidget(QLabel("Position Y"), 2, 0)   # Titre Rangées #2 à gauche
-        self.pos_y_min = QDoubleSpinBox()                   # Crée la case éditable
-        self.pos_y_min.setRange(-1000, 1000)                # Range Min & Max
-        self.pos_y_min.setValue(0)                          # Valeur par défaut
-
-        self.pos_y_max = QDoubleSpinBox()                   # Crée la case éditable
-        self.pos_y_max.setRange(-1000, 1000)                # Range Min & Max
-        self.pos_y_max.setValue(10)                         # Valeur par défaut
-
-        grid_layout.addWidget(self.pos_y_min, 2, 1)         # Rangée 2, Colonne 1
-        grid_layout.addWidget(self.pos_y_max, 2, 2)         # Rangée 2, Colonne 2
-
-        # ------------------------- "Position Z" ------------------------ #
-        # Configuration des colonnes & de la rangée
-        grid_layout.addWidget(QLabel("Position Z"), 3, 0)   # Titre Rangées #3 à gauche
-        self.pos_z_min = QDoubleSpinBox()                   # Crée la case éditable
-        self.pos_z_min.setRange(-1000, 1000)                # Range Min & Max
-        self.pos_z_min.setValue(-10)                        # Valeur par défaut
-
-        self.pos_z_max = QDoubleSpinBox()                   # Crée la case éditable
-        self.pos_z_max.setRange(-1000, 1000)                # Range Min & Max
-        self.pos_z_max.setValue(10)                         # Valeur par défaut
-
-        grid_layout.addWidget(self.pos_z_min, 3, 1)         # Rangée 3, Colonne 1
-        grid_layout.addWidget(self.pos_z_max, 3, 2)         # Rangée 3, Colonne 2
-
-        # --------------------------- "Scale" -------------------------- #
-        # Configuration des colonnes & de la rangée
-        grid_layout.addWidget(QLabel("Scale"), 4, 0)        # Titre Rangées #4 à gauche
-        self.scale_min = QDoubleSpinBox()                   # Crée la case éditable
-        self.scale_min.setRange(0.1, 100)                   # Range Min & Max
-        self.scale_min.setValue(1)                          # Valeur par défaut 
-
-        self.scale_max = QDoubleSpinBox()                   # Crée la case éditable
-        self.scale_max.setRange(0.1, 100)                   # Range Min & Max
-        self.scale_max.setValue(3)                          # Valeur par défaut
-
-        grid_layout.addWidget(self.scale_min, 4, 1)         # Rangée 4, Colonne 1
-        grid_layout.addWidget(self.scale_max, 4, 2)         # Rangée 4, Colonne 2
-
-        
-        # Ajout des infos ci-dessus au layout principal
-        layout.addLayout(grid_layout)                       # Ceci ajoute X, Y, Z & Scale au layout vertical principal
-        
         #                       --------------------
 
         # Création du BOUTON magique // ATTENTION : Placez le bouton APRÈS les "spinbox" pour une meilleure ergonomie
-        self.button = QPushButton("Click donc ici voir... MAGIE !")
-        layout.addWidget(self.button)                       # Ceci ajoute le bouton au layout vertical principal
-        
+        self.button = QPushButton("Construire les défenses de la ville !")
+        layout.addWidget(self.button)                                           # Ceci ajoute le bouton au layout vertical principal
+
         # Connexion du signal 'clicked' vers la méthode de génération
         self.button.clicked.connect(self.on_click)
 
-        #                       --------------------
+    # ----------- (update_numb_label) !!! C'est nouveau ça !!! ----------- #
+    # Méthode pour mettre à jour l'affichage du nombre à côté du slider
+    def update_numb_label(self, value):
+        self.numb_value_label.setText(str(value))
 
-    # Fonction appelée via le Bouton pour appliquer nos choix et les générer 
+    #                       --------------------
+       
+    # Fonction appelée via le Bouton pour générer la clôture _ poteaux + 3 planches (Up = 6", Mid = 12", Bas = 6")
     def on_click(self):
-        # Récupère la Qty d'objets à générer
-        qty = self.obj_spin.value()
+        # Récupère le nombre de poteaux ainsi que leur espacement
+        total_poteau = self.numb_slider.value()
+        spacing = self.spacing_spin.value()
 
-        # Récupère les limites des positions X, Y, Z
-        x_min = self.pos_x_min.value()
-        x_max = self.pos_x_max.value()
+        # ---------- CALCULS DES DIMENSIONS & POSITIONS (en unités Maya) ---------- #
+        # Longueur totale de la clôture et centre sur l'axe X
+        total_length = (total_poteau - 1) * spacing
+        center_x = total_length / 2.0
 
-        y_min = self.pos_y_min.value()
-        y_max = self.pos_y_max.value()
+        # - DESCRIPTION - Hauteurs Y prédéfinies pour le positionnement des 3 planches :
+        #   - Planche du Bas (2x6)  : Espace de 30cm (12") du sol
+        #   - Planche du Mid (2x12) : Espace de 10cm (4") au-dessus de la planche du Bas
+        #   - Planche du Up (2x6)   : Espace de 10cm (4") au-dessus de la planche du Mid
+        y_bas = 0.30                            # Espace du bas et/ou sol 30cm
+        y_mid = y_bas + 0.15 + 0.10 + 0.15      # Centre de la planche du milieu (2x12)
+        y_up = y_mid + 0.15 + 0.10 + 0.075      # Centre de la planche du haut (2x6)
 
-        z_min = self.pos_z_min.value()
-        z_max = self.pos_z_max.value()
+        # Hauteur poteau dépasse de 10 cm (4") au-dessus
+        poteau_height = y_up + 0.15 + 0.10      # Dépasse de 10cm en haut
 
-        # Récupère les limites du Scale
-        s_min = self.scale_min.value()
-        s_max = self.scale_max.value()
+        # ---------- FOR LOOP - Génération des poteaux alignés ---------- #
+        for i in range(total_poteau):
+            # Création du poteau (un cylindre de 0.1 rayon)
+            poteau_obj = cmds.polyCylinder(radius=0.1, height=poteau_height)[0]     # le [0] c'est l'incrémentation de maya 0, 1, 2...
 
-        # ----------FOR LOOP !!! C'est nouveau ça !!! ---------- #
-        # Pour générer les objs inscrites dans l'outil
-        for _ in range(qty):
-            # Choisi Random un forme * la Qty entrée parmi ceux dans le paramètre
-            forme = random.choice(["cube", "cylindre", "cone", "sphere"])
+            # Calcul de la position X du poteau
+            pos_x = i * spacing
 
-            # Création des formes 3D dans la scène Maya de façon Random
-            # Ça prend les noms spécifique que Maya a par défaut pour les créer
-            if forme == "cube":
-                obj_create = cmds.polyCube()[0]          # Ceci [0] & "cmds" c'est géré par Maya pour récupérer le nom de l'objet créé
-            elif forme == "cylindre":
-                obj_create = cmds.polyCylinder()[0]
-            elif forme == "cone":
-                obj_create = cmds.polyCone()[0]
-            else:
-                obj_create = cmds.polySphere()[0]
+            # Placement du poteau sur l'axe X (Y ajusté pour que la base repose au sol)
+            cmds.move(pos_x, poteau_height / 2.0, 0, poteau_obj)
 
-            # Randomize les Ojbs dans la scène en se fiant aux limites choisies dans l'outil
-            rand_x = random.uniform(x_min, x_max)
-            rand_y = random.uniform(y_min, y_max)
-            rand_z = random.uniform(z_min, z_max)
-            rand_scale = random.uniform(s_min, s_max)
 
-            # Applique les nouvelles valeurs aux Objs en les plaçant dans Maya
-            cmds.move(rand_x, rand_y, rand_z, obj_create)
-            cmds.scale(rand_scale, rand_scale, rand_scale, obj_create)
+        # ---------- CRÉATION DES 3 PLANCHES HORIZONTALES (TRAVERSES) ---------- #
+        # Liste des planches : (nom_variante, hauteur_y, largeur_l)
+        planche_config = [("Planche_Bas_2x6", y_bas, 0.15), ("Planche_Centre_2x12", y_mid, 0.30), ("Planche_Haut_2x6", y_up, 0.15)]
+
+        # Boucle pour générer et placer chacune des 3 planches (1 seul cube par planche pour la logueur totale de la clôture)
+        for nom, y_pos, largeur_planche in planche_config:
+            # Création du cube de la planche
+            planche_obj = cmds.polyCube(width=1.0, height=largeur_planche, depth=0.05, name=nom)[0]
+
+            # Scale en X de la planche sur toute la longueur de la clôture
+            cmds.scale(total_length, 1, 1, planche_obj)
+
+            # Alignement au centre X, à la hauteur Y spécifique & un petit décalé du poteau sur le Z pour éviter le clipping
+            cmds.move(center_x, y_pos, 0.1, planche_obj)
 
 # ------------------------------------------------------------------------------------------
 
@@ -191,53 +154,7 @@ def main():
         widget.close()
     except Exception:
         pass
-    widget = RandomGenerator()
+    widget = FenceGenerator()
     widget.show()
 
 main()
-
-
-
-"""
-# ------------------------------------------------------------------------------------------
-#                        Cette partie c'est le code fourni de base.
-# ------------------------------------------------------------------------------------------
-class RandomGenerator(QWidget):
-    
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Atelier 4-5")
-        self.setMinimumWidth(400)
-        self.build_ui()
-    
-    def build_ui(self):
-        layout = QVBoxLayout(self)
-
-        self.create_button = QPushButton("Create")
-        self.create_button.clicked.connect(self.create_object)
-        layout.addWidget(self.create_button)
-
-    def create_object(self):
-        forme = random.choice(["cube", "cylindre", "sphere"])
-
-        if forme == "cube":
-            objet = cmds.polyCube()[0]
-        elif forme == "cylindre":
-            objet = cmds.polyCylinder()[0]
-        else:
-            objet = cmds.polySphere()[0]
-
-        random_value = random.uniform(-10, 10)
-        cmds.move(random_value, random_value, random_value, objet)
-
-
-def main():
-    global tool_window
-    try:
-        tool_window.close()
-    except Exception:
-        pass
-    tool_window = RandomGenerator()
-    tool_window.show()
-
-main()"""
