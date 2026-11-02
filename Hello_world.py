@@ -40,6 +40,10 @@ cmds.confirmDialog(
 CTRL+SHIFT + P dans VS Code ->  Python: Select Interpreter -> Enter path FIND ->
      C:\Program Files\Autodesk\Maya2025\bin -> Et sélectionner MAYAPY.exe
      
+
+Savoir la liste que Python peut printer (dossier avec scripte que Python voit)
+print(sys.path)
+
 '''
 import sys
 
