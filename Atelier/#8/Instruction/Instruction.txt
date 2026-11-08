@@ -1,0 +1,30 @@
+Vous en avez mare de devoir chercher ou même de créer vos assets de chaises pour mettre dans votre jeu?
+J’AI EN PLEIN CE QU’IL VOUS FAUT !!
+Suivez les instructions ci-bas et vous allez voir la magie s’opérer devant vos yeux.
+Et vous allez faire des jaloux, croyez-moi.
+     |     |     |     |     |     |     |
+     |     |     |     |     |     |     |
+     |     |     |     |     |     |     |
+     |     |     |     |     |     |     |
+     |     |     |     |     |     |     |
+     V     V     V     V     V     V     V
+
+================== INSTRUCTION ==================
+COMMENT INSTALLER ET UTILISER MON OUTIL DANS MAYA
+
+ÉTAPES :
+1- Créez un dossier icones -> Documents\maya\scripts (pour mettre l'icône chaise.png fourni)
+_______________
+2- Ouvrir maya et cliquez sur le bouton dans le coin inférieur droit {:} pour ouvrir le script editor
+3- Créez une shelf custom via la petite roue dentelée à gauche dans une des shelves existante -> New Shelf
+_______________
+4- CTRL+C / CTRL+V de toute les lignes du code de Visual Studio Code dans le script edidor dans maya
+	4.1 - "assurez-vous qu'il soit vide"
+5- Depuis le script editor MAYA -> CTRL+A pour sélectionner le code et
+	ensuite glissez le avec click roulette dans la shelf custom créé précédemment
+_______________
+6- Ensuite associez l’image fourni au nouveau bouton du script dans la shelf
+	6.1 - Cliquez droit sur le bouton -> Open
+	6.2 - Dans la fenêtre au centre repérez ‘’Icon Name’’ et cliquez sur le petit dossier
+	6.3 - Allez dans le dossier créez précédemment pour aller sélectionner l’image chaise.png
+	6.4 - Fermez la fenêtre et vous avez le bouton fonctionnel, amusez-vous!
