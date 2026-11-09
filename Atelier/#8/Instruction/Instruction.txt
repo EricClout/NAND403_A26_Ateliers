@@ -1,3 +1,15 @@
+******* Outil que j'ai testé c'est celui de Maxence et Maxence à test mon outil *******
+Ses instructions sont très clair
+Étape par étape, tout est fluide et mentionne où cliquer
+Ne manque aucune étape pour l'installation de l'outil
+Sont code s'exécute dès que j'appuie sur le bouton dans la shelf
+100% Completed
+***************************************************************************************
+
+
+
+
+===================== INTRO =====================
 Vous en avez mare de devoir chercher ou même de créer vos assets de chaises pour mettre dans votre jeu?
 J’AI EN PLEIN CE QU’IL VOUS FAUT !!
 Suivez les instructions ci-bas et vous allez voir la magie s’opérer devant vos yeux.
@@ -17,6 +29,7 @@ COMMENT INSTALLER ET UTILISER MON OUTIL DANS MAYA
 _______________
 2- Ouvrir maya et cliquez sur le bouton dans le coin inférieur droit {:} pour ouvrir le script editor
 3- Créez une shelf custom via la petite roue dentelée à gauche dans une des shelves existante -> New Shelf
+     3.1 - Donner le nom que vous voulez
 _______________
 4- CTRL+C / CTRL+V de toute les lignes du code de Visual Studio Code dans le script edidor dans maya
 	4.1 - "assurez-vous qu'il soit vide"
