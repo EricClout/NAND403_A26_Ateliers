@@ -14,7 +14,10 @@ l'affichage "always on top" de Maya ainsi que le live edit. (les changements se 
 
 
 import random
+from PySide6.QtCore import Qt
 from maya import cmds
+import maya.OpenMayaUI as omui
+from shiboken6 import wrapInstance
 from PySide6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -26,12 +29,22 @@ from PySide6.QtWidgets import (
 )
 
 
+def maya_main_window():
+    pointer = omui.MQtUtil.mainWindow()
+    return wrapInstance(int(pointer), QWidget)
+
 class Scatter(QWidget):
 
     def __init__(self):
-        super().__init__()
+        self.source = None
+        self.scatter_group = None
+        self.copies = []
+        self.source_position = None
+
+        super().__init__(maya_main_window())
+        self.setWindowFlags(Qt.Window)
         self.setWindowTitle("Scatter")
-        self.setMinimumWidth(250)
+        self.setMinimumWidth(300)
         self.build_ui()
 
     def build_ui(self):
@@ -52,6 +65,10 @@ class Scatter(QWidget):
         self.seed_spin = QSpinBox()
         self.seed_spin.setRange(0, 9999)
         form.addRow("Seed", self.seed_spin)
+
+        self.count_spin.valueChanged.connect(self.scatter)
+        self.radius_spin.valueChanged.connect(self.scatter)
+        self.seed_spin.valueChanged.connect(self.scatter)
 
         scatter_button = QPushButton("Scatter")
         scatter_button.clicked.connect(self.scatter)
